@@ -1,5 +1,5 @@
 from Tkinter import Frame, Canvas, YES, BOTH
-import Leap
+from leap_motion_sdk import Leap
 
 class TouchPointListener(Leap.Listener):
     def on_init(self, controller):
