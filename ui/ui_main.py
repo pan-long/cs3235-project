@@ -1,6 +1,6 @@
 from Tkinter import Frame, Canvas, YES, BOTH
 from leap_motion_sdk import Leap
-from logic.leap_draw import LeapListener
+from logic.leap_listener import LeapListener
 
 class MainUI(Frame):
     def __init__( self ):
