@@ -1,7 +1,7 @@
 from Tkinter import Frame, Canvas, YES, BOTH
 from leap_motion_sdk import Leap
 
-class TouchPointListener(Leap.Listener):
+class LeapListener(Leap.Listener):
     def on_init(self, controller):
         print "Initialized"
 
@@ -36,25 +36,3 @@ class TouchPointListener(Leap.Listener):
         
     def rgb_to_hex(self, rgb):
         return '#%02x%02x%02x' % rgb
-
-class PaintBox(Frame):
-
-    def __init__( self ):
-        Frame.__init__( self )
-        self.leap = Leap.Controller()
-        self.painter = TouchPointListener()
-        self.leap.add_listener(self.painter)
-        self.pack( expand = YES, fill = BOTH )
-        self.master.title( "Touch Points" )
-        self.master.geometry( "800x600" )
-      
-        # create Canvas component
-        self.paintCanvas = Canvas( self, width = "800", height = "600" )
-        self.paintCanvas.pack()
-        self.painter.set_canvas(self.paintCanvas)
-
-def main():
-    PaintBox().mainloop()
-
-if __name__ == "__main__":
-    main()
