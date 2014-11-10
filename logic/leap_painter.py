@@ -14,14 +14,15 @@ class LeapPainter():
         return '#%02x%02x%02x' % rgb
 
     def getFrame(self, controller):
-        self.frame = controller.frame
+        self.currentFrame = controller.frame()
 
     def processFrame(self):
-        if self.frame.id == self.lastFrameId:
+        if self.currentFrame.id == self.lastFrameId:
             return
         else:
+            # any process of frame from Leap should goes here
             self.paintCanvas.delete("all")
-            frame = self.frame
+            frame = self.currentFrame
             interactionBox = frame.interaction_box
         
             for pointable in frame.pointables:
