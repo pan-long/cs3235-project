@@ -1,10 +1,18 @@
-from Tkinter import Frame, Canvas, YES, BOTH
+from Tkinter import *
+from PIL import Image, ImageTk
 from leap_motion_sdk import Leap
+from storage.storage import Storage
 from storage.preference import Arguments
 
 class LeapPainter():
     lastFrameId = 0
     started = False
+    isPressed = False
+    point_coord = []
+    isLeftHand = False
+    idleCounter = 0
+    lastIsIdle = False
+    points = []
 
     def draw(self, x, y, width, height, color):
         self.paintCanvas.create_oval(x, y, x + width, y + height, fill = color, outline = "")
@@ -26,6 +34,10 @@ class LeapPainter():
         else:
             # any process of frame from Leap should goes here
             self.paintCanvas.delete("all")
+            if Arguments.isUsingPictureMode:
+                self.image = ImageTk.PhotoImage(Image.open(Arguments.picturePath).resize((800, 600)))
+                self.paintCanvas.create_image(0, 0, image = self.image, anchor = NW)
+            
             frame = self.currentFrame
             interactionBox = frame.interaction_box
         
@@ -42,7 +54,16 @@ class LeapPainter():
                 
                 # if normalizedPosition.x is not greater than 0, the points will not 
                 # disapear in the canvas, but simply go along the edge
-                if normalizedPosition.x > 0: 
+                if normalizedPosition.x > 0 and normalizedPosition.y > 0: 
                     self.draw(normalizedPosition.x * 800, 600 - normalizedPosition.y * 600, 40, 40, color)
+
+            if Arguments.isUsingBinaryMode:
+                # if it is using left/right hand mode, simply use binary value for left/right hand, 
+                # any hand present will result in "pressed" status
+                if len(frame.hands) == 0:
+                    # if no hand present 
+                    if not lastIsIdle:
+                        points.append(isLeftHand)
+                        idleCounter += 1
 
             self.lastFrameId = frame.id

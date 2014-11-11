@@ -1,6 +1,6 @@
 import pickle
 
-class storage():
+class Storage():
 	@staticmethod
 	def write(object, filename):
 		with open(filename, 'wb') as writeHandler:

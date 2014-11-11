@@ -32,6 +32,7 @@ def main(argv):
 		elif opt in ("-p", "--picture"):
 			# use picture mode
 			Arguments.isUsingPictureMode = True
+			Arguments.picturePath = arg
 		elif opt in ("-s", "--set"):
 			# set authentication
 			Arguments.isSettingAuthentication = True
@@ -39,6 +40,7 @@ def main(argv):
 			# By default, use binary mode to set the authentication
 			Arguments.isSettingAuthentication = True
 			Arguments.isUsingBinaryMode = True
+	
 	# start the GUI
 	MainUI().mainloop()
 
