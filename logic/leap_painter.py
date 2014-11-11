@@ -82,7 +82,14 @@ class LeapPainter():
 		if Arguments.isUsingPictureMode:
 			return True
 		elif Arguments.isUsingBinaryMode:
-			return True
+			benchmark = Storage.read("binary.obj")
+			# Issue: always return True
+			if benchmark == self.points:
+				print True
+				return True
+			else :
+				print False
+				return False
 		elif Arguments.isUsingGestureMode:
 			return True
 		else:
@@ -104,6 +111,7 @@ class LeapPainter():
 				self.isNextBinaryGesture = True
 				if self.idleCounter >= 30:
 					# do verification and display something secret
+					self.verify()
 					sys.exit(0)
 				return  
 
