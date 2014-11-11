@@ -1,8 +1,10 @@
 from Tkinter import Frame, Canvas, YES, BOTH
 from leap_motion_sdk import Leap
+from storage.preference import Arguments
 
 class LeapPainter():
     lastFrameId = 0
+    started = False
 
     def draw(self, x, y, width, height, color):
         self.paintCanvas.create_oval(x, y, x + width, y + height, fill = color, outline = "")
@@ -37,7 +39,10 @@ class LeapPainter():
                     
                 else:
                     color = self.rgb_to_hex((0,0,200))
-                    
-                self.draw(normalizedPosition.x * 800, 600 - normalizedPosition.y * 600, 40, 40, color)
+                
+                # if normalizedPosition.x is not greater than 0, the points will not 
+                # disapear in the canvas, but simply go along the edge
+                if normalizedPosition.x > 0: 
+                    self.draw(normalizedPosition.x * 800, 600 - normalizedPosition.y * 600, 40, 40, color)
 
             self.lastFrameId = frame.id
