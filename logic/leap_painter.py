@@ -18,6 +18,8 @@ class LeapPainter():
 
     def processFrame(self):
         if self.currentFrame.id == self.lastFrameId:
+            # if we requesting the frame too fast and get the same frame as last requesting,
+            # simply ignore this frame as we have processed already
             return
         else:
             # any process of frame from Leap should goes here

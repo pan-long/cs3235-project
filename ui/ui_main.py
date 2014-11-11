@@ -21,5 +21,5 @@ class MainUI(Tk):
     def processFrame(self):
         self.painter.getFrame(self.controller)
         self.painter.processFrame()
-        # set 20 FPS
+        # set to 20 FPS
         self.after(50, self.processFrame)
