@@ -1,5 +1,5 @@
 from Tkinter import *
-from PIL import ImageTk
+from PIL import Image, ImageTk
 from leap_motion_sdk import Leap
 from logic.leap_painter import LeapPainter
 from storage.preference import Arguments
