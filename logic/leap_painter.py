@@ -16,6 +16,8 @@ class LeapPainter():
 
 	isLeftHand = False
 
+	isNextBinaryGesture = True
+
 	# how many consecutive plain frames we have?
 	# if it hits a certain number, we should stop gesturing and start verifying
 	idleCounter = 0
@@ -65,6 +67,10 @@ class LeapPainter():
 
 	def processingBinaryMode(self, frame):
 		# TO-DO
+		if len(frame.hands) > 0 and self.isNextBinaryGesture:
+			self.points.append(frame.hands[0].is_left)
+			self.isNextBinaryGesture = False
+		Storage.write(self.points, "binary.obj")
 		return 
 
 	def processingGestureMode(self, frame):
@@ -73,7 +79,14 @@ class LeapPainter():
 
 	def verify(self):
 		# TO-DO
-		return True
+		if Arguments.isUsingPictureMode:
+			return True
+		elif Arguments.isUsingBinaryMode:
+			return True
+		elif Arguments.isUsingGestureMode:
+			return True
+		else:
+			return True
 
 	def processFrame(self):
 		if self.currentFrame.id == self.lastFrameId:
@@ -88,6 +101,7 @@ class LeapPainter():
 			# if the frame is plain, simply add counter
 			if len(frame.pointables) == 0:
 				self.idleCounter += 1
+				self.isNextBinaryGesture = True
 				if self.idleCounter >= 30:
 					# do verification and display something secret
 					sys.exit(0)
