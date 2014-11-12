@@ -42,7 +42,7 @@ class LeapPainter():
 		self.paintCanvas.create_oval(x, y, x + width, y + height, fill = color, outline = "")
 
 	def draw_line(self, x1, y1, x2, y2, width, color):
-		self.paintCanvas.create_line(x1, y1, x2, y2, width = width, dash = True)
+		self.paintCanvas.create_line(x1, y1, x2, y2, width = width, fill = color, dash = True)
 
 	def set_canvas(self, canvas):
 		self.paintCanvas = canvas
@@ -70,7 +70,7 @@ class LeapPainter():
 		if Arguments.isUsingPictureMode:
 			color = self.rgb_to_hex((160, 0, 0))
 			for line in self.lines:
-				self.draw_line(line[0].x * 800, 600 - line[0].y * 600, line[1].x * 800, 600 - line[1].y * 600, 10, color)	
+				self.draw_line(line[0].x * 800, 600 - line[0].y * 600, line[1].x * 800, 600 - line[1].y * 600, 5, color)	
 
 	def processingPictureMode(self, frame):
 		interactionBox = frame.interaction_box
