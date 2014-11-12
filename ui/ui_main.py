@@ -1,5 +1,6 @@
 from Tkinter import *
 from PIL import Image, ImageTk
+import sys
 from leap_motion_sdk import Leap
 from logic.leap_painter import LeapPainter
 from storage.preference import Arguments
@@ -25,7 +26,24 @@ class MainUI(Tk):
         self.processFrame()
 
     def processFrame(self):
-        self.painter.getFrame(self.controller)
-        self.painter.processFrame()
-        # set to 20 FPS
-        self.after(50, self.processFrame)
+        if not Arguments.windowShouldClose:
+            self.painter.getFrame(self.controller)
+            self.painter.processFrame()
+            # set to 20 FPS
+            self.after(50, self.processFrame)
+        else:
+            self.geometry("450x200+400+300")
+            self.paintCanvas.delete("all")
+
+            text_id = self.paintCanvas.create_text(10, 60, anchor=NW)
+
+            text = ''
+
+            if Arguments.isSettingAuthentication:
+                text = 'Password Set Successfully!'
+            elif Arguments.isGestureVerified:
+                text = 'Verification Passed!'
+            else:
+                text = 'Verification Failed!'
+
+            self.paintCanvas.itemconfig(text_id, text=text, font=("Comic Sans", 30))

@@ -6,3 +6,4 @@ binary.obj
 .pydevproject
 
 *.obj
+*.data

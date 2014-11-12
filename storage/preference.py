@@ -8,3 +8,11 @@ class Arguments():
 	isUsingDebugMode = False
 	picturePath = ""
 	image = None
+
+	errorInGesture = 0.10
+	errorInPicture = 0.10
+	depthForPictureMode = -0.25
+	depthForBinaryMode = 0
+
+	windowShouldClose = False
+	isGestureVerified = False

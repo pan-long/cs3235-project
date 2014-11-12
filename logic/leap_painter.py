@@ -25,8 +25,6 @@ class LeapPainter():
 
 	isLeftHand = False
 
-	isNextBinaryGesture = True
-
 	# how many consecutive plain frames we have?
 	# if it hits a certain number, we should stop gesturing and start verifying
 	idleCounter = 0
@@ -64,7 +62,7 @@ class LeapPainter():
 		
 		# redraw what we have stored in our gesture
 		if Arguments.isUsingPictureMode or Arguments.isUsingGestureMode:
-			color = self.rgb_to_hex((0, 160, 0))
+			color = self.rgb_to_hex((100, 160, 0))
 			for point in self.printablePoints:
 				self.draw(point.x * 800, 600 - point.y * 600, 30, 30, color)
 
@@ -72,19 +70,61 @@ class LeapPainter():
 		if Arguments.isUsingPictureMode:
 			color = self.rgb_to_hex((160, 0, 0))
 			for line in self.lines:
-				self.draw_line(line[0].x, line[0].y, line[1].x, line[1].y, 10, color)	
+				self.draw_line(line[0].x * 800, 600 - line[0].y * 600, line[1].x * 800, 600 - line[1].y * 600, 10, color)	
 
 	def processingPictureMode(self, frame):
-		# TO-DO
-		return
+		interactionBox = frame.interaction_box
+
+		if len(frame.hands) > 0:
+			pointFinger = frame.hands[0].fingers.frontmost
+			normalizedPosition = interactionBox.normalize_point(pointFinger.tip_position)
+
+			if pointFinger.touch_distance > 0 and pointFinger.touch_zone != Leap.Pointable.ZONE_NONE:
+				color = self.rgb_to_hex((0, 255 - 255 * pointFinger.touch_distance, 0))
+				
+			elif pointFinger.touch_distance <= 0:
+				color = self.rgb_to_hex((-255 * pointFinger.touch_distance, 0, 0))
+				
+			else:
+				color = self.rgb_to_hex((0,0,200))
+
+			self.draw(normalizedPosition.x * 800, 600 - normalizedPosition.y * 600, 30, 30, color)
+
+			if pointFinger.touch_distance < Arguments.depthForPictureMode:
+				self.isPressed = True
+
+			elif self.isPressed:
+				self.isPressed = False
+				point = Point(normalizedPosition.x, normalizedPosition.y)
+				self.points.append(point)
+				self.printablePoints.append(normalizedPosition)
+				if len(self.printablePoints) > 1:
+					p1 = self.printablePoints[-1]
+					p2 = self.printablePoints[-2]
+					self.lines.append([p1, p2])
+
+				if Arguments.isSettingAuthentication:
+					Storage.write(self.points, "picture.data")
+
+			else:
+				return
+		else:
+			return
 
 	def processingBinaryMode(self, frame):
-		if len(frame.hands) > 0 and self.isNextBinaryGesture:
-			self.points.append(frame.hands[0].is_left)
-			self.printd(self.points)
-			self.isNextBinaryGesture = False
-		if Arguments.isSettingAuthentication:
-			Storage.write(self.points, "binary.obj")
+		if len(frame.hands) > 0:
+			# self.printd(str(frame.hands[0].palm_position.z))
+			if (not self.isPressed) and (frame.hands[0].palm_position.z < Arguments.depthForBinaryMode):
+				self.points.append(frame.hands[0].is_left)
+				self.printd(self.points)
+				self.isPressed = True
+
+				if Arguments.isSettingAuthentication:
+					Storage.write(self.points, "binary.data")
+
+			elif frame.hands[0].palm_position.z >= Arguments.depthForBinaryMode:
+				self.isPressed = False
+
 		return 
 
 	def processingGestureMode(self, frame):
@@ -165,32 +205,39 @@ class LeapPainter():
 		self.points.append(coordinate)
 		self.printd(len(self.points))
 		if Arguments.isSettingAuthentication:
-			Storage.write(self.points, "gesture.obj")
+			Storage.write(self.points, "gesture.data")
 		return
 
 	def verify(self):
 		if Arguments.isUsingPictureMode:
-			# TO-DO
-			return True
+			benchmark = Storage.read("picture.data")
+
+			if len(self.points) != len(benchmark):
+				return False
+			else:
+				for i in range(0, len(benchmark)):
+					self.printd(str(abs(self.points[i].x - benchmark[i].x)))
+					if abs(self.points[i].x - benchmark[i].x) > Arguments.errorInPicture:
+						return False
+					elif abs(self.points[i].y - benchmark[i].y) > Arguments.errorInPicture:
+						return False
+				return True
+
+
 		elif Arguments.isUsingBinaryMode:
 			# May change to another filename
-			benchmark = Storage.read("binary.obj")
+			benchmark = Storage.read("binary.data")
 			self.printd("Current: %s" % self.points)
 			self.printd("Benchmark: %s" % benchmark)
-			if benchmark == self.points:
-				print "Verification Passed."
-				return True
-			else:
-				print "Verification Failed."
-				return False
+			return benchmark == self.points
+
 		elif Arguments.isUsingGestureMode:
-			benchmark = Storage.read("gesture.obj")
+			benchmark = Storage.read("gesture.data")
 			# If numbers of frames have a significant difference, reject immediately.
 			if (len(self.points) < len(benchmark) * 0.5) or (len(self.points) > len(benchmark) * 1.5):
-				print "Verification Failed."
 				return False
 			
-			k = 0.10
+			k = Arguments.errorInGesture
 			threshold = 0.0
 			rmsdiff = 0.0
 			for i in range(0, min(len(self.points), len(benchmark))):
@@ -206,10 +253,7 @@ class LeapPainter():
 			self.printd(rmsdiff)
 			self.printd("threshold:")
 			self.printd(threshold)
-			if rmsdiff <= threshold:
-				print "Verification Passed."
-			else:
-				print "Verification Failed."
+
 			return (rmsdiff <= threshold)
 
 		else:
@@ -230,12 +274,17 @@ class LeapPainter():
 			# if the frame is plain, simply add counter
 			if len(frame.pointables) == 0:
 				self.idleCounter += 1
-				self.isNextBinaryGesture = True
 				if self.idleCounter >= 30:
 					# do verification and display something secret
+					Arguments.windowShouldClose = True
 					if not Arguments.isSettingAuthentication:
-						self.verify()
-					sys.exit(0)
+						result = self.verify()
+						if result:
+							Arguments.isGestureVerified = True
+							print "Verification Passed!"
+						else:
+							Arguments.isGestureVerified = False
+							print "Verification Failed!"
 				return  
 
 			# if this frame is not plain, reset the counter to 0
