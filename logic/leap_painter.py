@@ -193,7 +193,7 @@ class LeapPainter():
 			k = 0.10
 			threshold = 0.0
 			rmsdiff = 0.0
-			for i in range(1, min(len(self.points), len(benchmark))):
+			for i in range(0, min(len(self.points), len(benchmark))):
 				for j in range(0, 30):	
 					rmsdiff += (self.points[i][j] - benchmark[i][j]) ** 2
 					threshold += k * (benchmark[i][j] ** 2)
