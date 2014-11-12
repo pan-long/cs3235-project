@@ -50,7 +50,7 @@ class LeapPainter():
 			self.paintCanvas.create_image(0, 0, image = self.image, anchor = NW)
 		
 		# redraw what we have stored in our gesture
-		if Arguments.isUsingPictureMode or Arguments.isUsingGestureMode:
+		if Arguments.isUsingPictureMode:# or Arguments.isUsingGestureMode:
 			color = self.rgb_to_hex((200, 0, 0))
 			for point in self.points:
 				self.draw(point.x * 800, 600 - point.y, 40, 40, color)
@@ -63,10 +63,10 @@ class LeapPainter():
 
 	def processingPictureMode(self, frame):
 		# TO-DO
+
 		return
 
 	def processingBinaryMode(self, frame):
-		# TO-DO
 		if len(frame.hands) > 0 and self.isNextBinaryGesture:
 			self.points.append(frame.hands[0].is_left)
 			self.isNextBinaryGesture = False
@@ -76,6 +76,56 @@ class LeapPainter():
 
 	def processingGestureMode(self, frame):
 		# TO-DO
+		coordinate = []
+		if len(frame.hands) == 2:
+			if frame.hands[0].is_left:
+				for i in range(0, len(frame.hands[0].fingers)):
+					coordinate.append(frame.hands[0].fingers[i].tip_position.x)
+					coordinate.append(frame.hands[0].fingers[i].tip_position.y)
+					coordinate.append(frame.hands[0].fingers[i].tip_position.z)
+				for i in range(len(frame.hands[0].fingers), 5):
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+			else:
+				for i in range(5, len(frame.hands[1].fingers) + 5):
+					coordinate.append(frame.hands[1].fingers[i].tip_position.x)
+					coordinate.append(frame.hands[1].fingers[i].tip_position.y)
+					coordinate.append(frame.hands[1].fingers[i].tip_position.z)
+				for i in range(len(frame.hands[1].fingers) + 5, 10):
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+		elif len(frame.hands) == 1:
+			if frame.hands[0].is_left:
+				for i in range(0, len(frame.hands[0].fingers)):
+					coordinate.append(frame.hands[0].fingers[i].tip_position.x)
+					coordinate.append(frame.hands[0].fingers[i].tip_position.y)
+					coordinate.append(frame.hands[0].fingers[i].tip_position.z)
+				for i in range(len(frame.hands[0].fingers), 10):
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+			else:
+				for i in range(0, 5):
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+				for i in range(5, len(frame.hands[0].fingers) + 5):
+					coordinate.append(frame.hands[0].fingers[i].tip_position.x)
+					coordinate.append(frame.hands[0].fingers[i].tip_position.y)
+					coordinate.append(frame.hands[0].fingers[i].tip_position.z)
+				for i in range(len(frame.hands[0].fingers) + 5, 10):
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+		else:
+			return
+
+		self.points.append(coordinate)
+		print self.points
+		if Arguments.isSettingAuthentication:
+			Storage.write(self.points, "gesture.obj")
 		return
 
 	def verify(self):
@@ -88,14 +138,38 @@ class LeapPainter():
 			print ("Current: %s" % self.points)
 			# print ("Benchmark: %s" % benchmark)
 			if benchmark == self.points:
-				print True
+				print "Verification Passed."
 				return True
 			else :
-				print False
+				print "Verification Failed."
 				return False
 		elif Arguments.isUsingGestureMode:
 			# TO-DO
-			return True
+			benchmark = Storage.read("gesture.obj")
+			k = 4000.0
+			threshold = k * pow(len(benchmark), 1.5)
+			delta = 0.0
+			for i in range(1, min(len(benchmark), len(self.points))):
+				for j in range(0, 30):	
+					delta += pow((benchmark[i][j] - benchmark[i-1][j]) 
+						- (self.points[i][j] - self.points[i-1][j]), 2)
+
+			for i in range(min(len(benchmark), len(self.points)), max(len(benchmark), len(self.points))):
+				if len(benchmark) == max(len(benchmark), len(self.points)):
+					for j in range(0, 30):
+						delta += pow(benchmark[i][j] - benchmark[i-1][j], 2)
+				else:
+					for j in range(0, 30):
+						delta += pow(self.points[i][j] - self.points[i-1][j], 2)
+
+			print "delta: %s" % delta
+			print "threshold: %s" % threshold
+			if delta <= threshold:
+				print "Verification Passed."
+			else:
+				print "Verification Failed."
+			return (delta <= threshold)
+			
 		
 
 	def processFrame(self):
