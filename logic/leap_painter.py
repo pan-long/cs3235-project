@@ -1,5 +1,6 @@
 from Tkinter import *
 from PIL import Image, ImageTk
+import math
 from operator import attrgetter
 from leap_motion_sdk import Leap
 from storage.storage import Storage
@@ -169,25 +170,27 @@ class LeapPainter():
 				print "Verification Failed."
 				return False
 			
-			k = 0.20
+			k = 0.10
 			threshold = 0.0
-			delta = 0.0
+			rmsdiff = 0.0
 			for i in range(1, min(len(self.points), len(benchmark))):
 				for j in range(0, 30):	
-					delta += pow((self.points[i][j] - self.points[i-1][j]) - (benchmark[i][j] - benchmark[i-1][j]), 2)
-					threshold += k * pow((benchmark[i][j] - benchmark[i-1][j]), 2)
+					rmsdiff += (self.points[i][j] - benchmark[i][j]) ** 2
+					threshold += k * (benchmark[i][j] ** 2)
+			
+			rmsdiff += k * abs(len(self.points) - len(benchmark)) * threshold / 20
+			rmsdiff = math.sqrt(rmsdiff / min(len(self.points), len(benchmark)))
+			threshold = math.sqrt(threshold / min(len(self.points), len(benchmark)))
 
-			# delta += k * abs(len(self.points) - len(benchmark)) * threshold / 20
-
-			self.printd("delta:")
-			self.printd(delta)
+			self.printd("rmsdiff:")
+			self.printd(rmsdiff)
 			self.printd("threshold:")
 			self.printd(threshold)
-			if delta <= threshold:
+			if rmsdiff <= threshold:
 				print "Verification Passed."
 			else:
 				print "Verification Failed."
-			return (delta <= threshold)
+			return (rmsdiff <= threshold)
 
 		else:
 			return False
