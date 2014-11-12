@@ -163,7 +163,7 @@ class LeapPainter():
 			# TO-DO
 			benchmark = Storage.read("gesture.obj")
 			# If numbers of frames have a significant difference, reject immediately.
-			if (len(self.points) < len(benchmark) * 0.5) or (len(self.points) > len(benchmark) * 2):
+			if (len(self.points) < len(benchmark) * 0.8) or (len(self.points) > len(benchmark) * 1.25):
 				print "Verification Failed."
 				return False
 			
@@ -172,7 +172,10 @@ class LeapPainter():
 			delta = 0.0
 			for i in range(1, min(len(benchmark), len(self.points))):
 				for j in range(0, 30):	
-					delta += pow((self.points[i][j] - self.points[i-1][j]) - (benchmark[i][j] - benchmark[i-1][j]), 2)
+					if self.points[i][j] == 0.0 and self.points[i-1][j] == 0.0:
+						delta += k * 30 * 2
+					else:
+						delta += pow((self.points[i][j] - self.points[i-1][j]) - (benchmark[i][j] - benchmark[i-1][j]), 2)
 
 			for i in range(min(len(benchmark), len(self.points)), max(len(benchmark), len(self.points))):
 				if len(benchmark) == max(len(benchmark), len(self.points)):
