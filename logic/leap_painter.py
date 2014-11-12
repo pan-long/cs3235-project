@@ -169,18 +169,15 @@ class LeapPainter():
 				print "Verification Failed."
 				return False
 			
-			k = 50.0
-			penalty = k * 30.0
-			threshold = k * pow(len(benchmark) * 30, 1.5)
+			k = 0.20
+			threshold = 0.0
 			delta = 0.0
 			for i in range(1, min(len(self.points), len(benchmark))):
 				for j in range(0, 30):	
-					if self.points[i][j] == 0.0 and self.points[i-1][j] == 0.0 and (benchmark[i][j] != 0.0 or benchmark[i-1][j] != 0.0):
-						delta += penalty
-					else:
-						delta += pow((self.points[i][j] - self.points[i-1][j]) - (benchmark[i][j] - benchmark[i-1][j]), 2)
+					delta += pow((self.points[i][j] - self.points[i-1][j]) - (benchmark[i][j] - benchmark[i-1][j]), 2)
+					threshold += k * pow((benchmark[i][j] - benchmark[i-1][j]), 2)
 
-			delta += penalty * 30 * abs(len(self.points) - len(benchmark))
+			# delta += k * abs(len(self.points) - len(benchmark)) * threshold / 20
 
 			self.printd("delta:")
 			self.printd(delta)
@@ -191,6 +188,9 @@ class LeapPainter():
 			else:
 				print "Verification Failed."
 			return (delta <= threshold)
+
+		else:
+			return False
 			
 		
 
