@@ -115,6 +115,12 @@ class LeapPainter():
 		if len(frame.hands) > 0:
 			# self.printd(str(frame.hands[0].palm_position.z))
 			if (not self.isPressed) and (frame.hands[0].palm_position.z < Arguments.depthForBinaryMode):
+				color = self.rgb_to_hex((0,0,200))
+				if frame.hands[0].is_left:
+					self.draw(150, 250, 100, 100, color)
+				else:
+					self.draw(550, 250, 100, 100, color)
+
 				self.points.append(frame.hands[0].is_left)
 				self.printd(self.points)
 				self.isPressed = True
