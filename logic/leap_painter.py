@@ -26,6 +26,10 @@ class LeapPainter():
 	points = []
 	lines = []
 
+	def printd(self, string):
+		if Arguments.isUsingDebugMode:
+			print string
+
 	def draw(self, x, y, width, height, color):
 		self.paintCanvas.create_oval(x, y, x + width, y + height, fill = color, outline = "")
 
@@ -69,6 +73,7 @@ class LeapPainter():
 	def processingBinaryMode(self, frame):
 		if len(frame.hands) > 0 and self.isNextBinaryGesture:
 			self.points.append(frame.hands[0].is_left)
+			self.printd(self.points)
 			self.isNextBinaryGesture = False
 		if Arguments.isSettingAuthentication:
 			Storage.write(self.points, "binary.obj")
@@ -138,7 +143,7 @@ class LeapPainter():
 			return
 
 		self.points.append(coordinate)
-		#print self.points
+		self.printd(len(self.points))
 		if Arguments.isSettingAuthentication:
 			Storage.write(self.points, "gesture.obj")
 		return
@@ -150,12 +155,12 @@ class LeapPainter():
 		elif Arguments.isUsingBinaryMode:
 			# May change to another filename
 			benchmark = Storage.read("binary.obj")
-			#print ("Current: %s" % self.points)
-			#print ("Benchmark: %s" % benchmark)
+			self.printd("Current: %s" % self.points)
+			self.printd("Benchmark: %s" % benchmark)
 			if benchmark == self.points:
 				print "Verification Passed."
 				return True
-			else :
+			else:
 				print "Verification Failed."
 				return False
 		elif Arguments.isUsingGestureMode:
@@ -178,8 +183,10 @@ class LeapPainter():
 
 			delta += penalty * 30 * abs(len(self.points) - len(benchmark))
 
-			#print "delta: %s" % delta
-			#print "threshold: %s" % threshold
+			self.printd("delta:")
+			self.printd(delta)
+			self.printd("threshold:")
+			self.printd(threshold)
 			if delta <= threshold:
 				print "Verification Passed."
 			else:

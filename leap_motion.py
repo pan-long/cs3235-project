@@ -6,7 +6,7 @@ from storage.preference import Arguments
 
 def main(argv):
 	try:
-		opts, args = getopt.getopt(argv,"abghsp:",["picturePath="])
+		opts, args = getopt.getopt(argv,"abghsdp:",["picturePath="])
 	except getopt.GetoptError:
 		print 'leap_motion.py [-abghps]'
 		sys.exit(2)
@@ -36,6 +36,8 @@ def main(argv):
 		elif opt in ("-s", "--set"):
 			# set authentication
 			Arguments.isSettingAuthentication = True
+		elif opt in ("-d", "--debug"):
+			Arguments.isUsingDebugMode = True
 		else:
 			# By default, use binary mode to set the authentication
 			Arguments.isSettingAuthentication = True

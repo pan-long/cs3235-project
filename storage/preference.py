@@ -3,4 +3,5 @@ class Arguments():
 	isUsingBinaryMode = False
 	isUsingGestureMode = False
 	isUsingPictureMode = False
+	isUsingDebugMode = False
 	picturePath = ""
