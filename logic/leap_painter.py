@@ -75,7 +75,6 @@ class LeapPainter():
 		return 
 
 	def processingGestureMode(self, frame):
-		# TO-DO
 		coordinate = []
 		if len(frame.hands) == 2:
 			if frame.hands[0].is_left:
@@ -160,30 +159,30 @@ class LeapPainter():
 				print "Verification Failed."
 				return False
 		elif Arguments.isUsingGestureMode:
-			# TO-DO
 			benchmark = Storage.read("gesture.obj")
 			# If numbers of frames have a significant difference, reject immediately.
-			if (len(self.points) < len(benchmark) * 0.8) or (len(self.points) > len(benchmark) * 1.25):
+			if (len(self.points) < len(benchmark) * 0.5) or (len(self.points) > len(benchmark) * 1.5):
 				print "Verification Failed."
 				return False
 			
 			k = 50.0
 			threshold = k * pow(len(benchmark) * 30, 1.5)
 			delta = 0.0
-			for i in range(1, min(len(benchmark), len(self.points))):
+			for i in range(1, min(len(self.points), len(benchmark))):
 				for j in range(0, 30):	
-					if self.points[i][j] == 0.0 and self.points[i-1][j] == 0.0:
+					if self.points[i][j] == 0.0 and self.points[i-1][j] == 0.0 and (benchmark[i][j] != 0.0 or benchmark[i-1][j] != 0.0):
 						delta += k * 30 * 2
 					else:
 						delta += pow((self.points[i][j] - self.points[i-1][j]) - (benchmark[i][j] - benchmark[i-1][j]), 2)
 
-			for i in range(min(len(benchmark), len(self.points)), max(len(benchmark), len(self.points))):
-				if len(benchmark) == max(len(benchmark), len(self.points)):
-					for j in range(0, 30):
-						delta += pow(benchmark[i][j] - benchmark[i-1][j], 2)
-				else:
-					for j in range(0, 30):
-						delta += pow(self.points[i][j] - self.points[i-1][j], 2)
+			delta += k * 30 * 2 * 30 * abs(len(self.points)-len(benchmark))
+			#for i in range(min(len(benchmark), len(self.points)), max(len(benchmark), len(self.points))):
+				#if len(benchmark) == max(len(benchmark), len(self.points)):
+					#for j in range(0, 30):
+						#delta += k * 30 * 2#pow(benchmark[i][j] - benchmark[i-1][j], 2)
+				#else:
+					#for j in range(0, 30):
+						#delta += k * 30 * 2#pow(self.points[i][j] - self.points[i-1][j], 2)
 
 			print "delta: %s" % delta
 			print "threshold: %s" % threshold
