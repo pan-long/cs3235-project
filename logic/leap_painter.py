@@ -138,7 +138,7 @@ class LeapPainter():
 			return
 
 		self.points.append(coordinate)
-		print self.points
+		#print self.points
 		if Arguments.isSettingAuthentication:
 			Storage.write(self.points, "gesture.obj")
 		return
@@ -150,8 +150,8 @@ class LeapPainter():
 		elif Arguments.isUsingBinaryMode:
 			# May change to another filename
 			benchmark = Storage.read("binary.obj")
-			print ("Current: %s" % self.points)
-			# print ("Benchmark: %s" % benchmark)
+			#print ("Current: %s" % self.points)
+			#print ("Benchmark: %s" % benchmark)
 			if benchmark == self.points:
 				print "Verification Passed."
 				return True
@@ -166,26 +166,20 @@ class LeapPainter():
 				return False
 			
 			k = 50.0
+			penalty = k * 30.0
 			threshold = k * pow(len(benchmark) * 30, 1.5)
 			delta = 0.0
 			for i in range(1, min(len(self.points), len(benchmark))):
 				for j in range(0, 30):	
 					if self.points[i][j] == 0.0 and self.points[i-1][j] == 0.0 and (benchmark[i][j] != 0.0 or benchmark[i-1][j] != 0.0):
-						delta += k * 30 * 2
+						delta += penalty
 					else:
 						delta += pow((self.points[i][j] - self.points[i-1][j]) - (benchmark[i][j] - benchmark[i-1][j]), 2)
 
-			delta += k * 30 * 2 * 30 * abs(len(self.points)-len(benchmark))
-			#for i in range(min(len(benchmark), len(self.points)), max(len(benchmark), len(self.points))):
-				#if len(benchmark) == max(len(benchmark), len(self.points)):
-					#for j in range(0, 30):
-						#delta += k * 30 * 2#pow(benchmark[i][j] - benchmark[i-1][j], 2)
-				#else:
-					#for j in range(0, 30):
-						#delta += k * 30 * 2#pow(self.points[i][j] - self.points[i-1][j], 2)
+			delta += penalty * 30 * abs(len(self.points) - len(benchmark))
 
-			print "delta: %s" % delta
-			print "threshold: %s" % threshold
+			#print "delta: %s" % delta
+			#print "threshold: %s" % threshold
 			if delta <= threshold:
 				print "Verification Passed."
 			else:
