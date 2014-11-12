@@ -47,3 +47,5 @@ class MainUI(Tk):
                 text = 'Verification Failed!'
 
             self.paintCanvas.itemconfig(text_id, text=text, font=("Comic Sans", 30))
+
+            self.after(3000, sys.exit)
