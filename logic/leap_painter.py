@@ -6,6 +6,14 @@ from leap_motion_sdk import Leap
 from storage.storage import Storage
 from storage.preference import Arguments
 
+class Point:
+	x = 0.0
+	y = 0.0
+
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
+
 class LeapPainter():
 	lastFrameId = 0
 
@@ -25,6 +33,7 @@ class LeapPainter():
 
 	# all the points we have stores in gestures
 	points = []
+	printablePoints = []
 	lines = []
 
 	def printd(self, string):
@@ -54,10 +63,10 @@ class LeapPainter():
 			self.paintCanvas.create_image(0, 0, image = Arguments.image, anchor = NW)
 		
 		# redraw what we have stored in our gesture
-		if Arguments.isUsingPictureMode:# or Arguments.isUsingGestureMode:
-			color = self.rgb_to_hex((200, 0, 0))
-			for point in self.points:
-				self.draw(point.x * 800, 600 - point.y, 40, 40, color)
+		if Arguments.isUsingPictureMode or Arguments.isUsingGestureMode:
+			color = self.rgb_to_hex((0, 160, 0))
+			for point in self.printablePoints:
+				self.draw(point.x * 800, 600 - point.y * 600, 40, 40, color)
 
 		# redraw lines that we have stored
 		if Arguments.isUsingPictureMode:
@@ -67,7 +76,6 @@ class LeapPainter():
 
 	def processingPictureMode(self, frame):
 		# TO-DO
-
 		return
 
 	def processingBinaryMode(self, frame):
@@ -81,6 +89,8 @@ class LeapPainter():
 
 	def processingGestureMode(self, frame):
 		coordinate = []
+		interactionBox = frame.interaction_box
+
 		if len(frame.hands) == 2:
 			if frame.hands[0].is_left:
 				for i in range(0, len(frame.hands[0].fingers)):
@@ -141,6 +151,16 @@ class LeapPainter():
 					coordinate.append(0.0)
 		else:
 			return
+
+		average = Point(0.0, 0.0)
+		for point in frame.pointables:
+			point = interactionBox.normalize_point(point.tip_position)
+			average.x += point.x
+			average.y += point.y
+
+		average.x = average.x / len(frame.pointables)
+		average.y = average.y / len(frame.pointables)
+		self.printablePoints.append(average)
 
 		self.points.append(coordinate)
 		self.printd(len(self.points))
