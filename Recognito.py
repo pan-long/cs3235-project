@@ -8,11 +8,11 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"abghsdp:",["picturePath="])
 	except getopt.GetoptError:
-		print 'Recognito.py [-abghps]'
+		print 'leap_motion.py [-abghps]'
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt in ("-h", "--help"):
-			print 'Recognito.py [-abghps]'
+			print 'leap_motion.py [-abghps]'
 			print '-a authenticate'
 			print '-b use binary authentication'
 			print '-g use gesture authentication'
