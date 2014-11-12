@@ -50,8 +50,7 @@ class LeapPainter():
 		self.paintCanvas.delete("all")
 		# redraw the background image
 		if Arguments.isUsingPictureMode:
-			self.image = ImageTk.PhotoImage(Image.open(Arguments.picturePath).resize((800, 600)))
-			self.paintCanvas.create_image(0, 0, image = self.image, anchor = NW)
+			self.paintCanvas.create_image(0, 0, image = Arguments.image, anchor = NW)
 		
 		# redraw what we have stored in our gesture
 		if Arguments.isUsingPictureMode:# or Arguments.isUsingGestureMode:

@@ -1,3 +1,5 @@
+from PIL import Image, ImageTk
+
 class Arguments():
 	isSettingAuthentication = False
 	isUsingBinaryMode = False
@@ -5,3 +7,4 @@ class Arguments():
 	isUsingPictureMode = False
 	isUsingDebugMode = False
 	picturePath = ""
+	image = None

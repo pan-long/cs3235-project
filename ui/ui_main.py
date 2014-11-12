@@ -18,8 +18,8 @@ class MainUI(Tk):
         self.paintCanvas.pack(expand = YES, fill=BOTH)
 
         if Arguments.isUsingPictureMode:
-            self.image = ImageTk.PhotoImage(Image.open(Arguments.picturePath).resize((800, 600)))
-            self.paintCanvas.create_image(0, 0, image = self.image, anchor = NW)
+            Arguments.image = ImageTk.PhotoImage(Image.open(Arguments.picturePath).resize((800, 600)))
+            self.paintCanvas.create_image(0, 0, image = Arguments.image, anchor = NW)
 
         self.painter.set_canvas(self.paintCanvas)
 
