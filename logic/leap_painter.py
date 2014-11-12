@@ -70,7 +70,8 @@ class LeapPainter():
 		if len(frame.hands) > 0 and self.isNextBinaryGesture:
 			self.points.append(frame.hands[0].is_left)
 			self.isNextBinaryGesture = False
-		Storage.write(self.points, "binary.obj")
+		if Arguments.isSettingAuthentication:
+			Storage.write(self.points, "binary.obj")
 		return 
 
 	def processingGestureMode(self, frame):
@@ -78,12 +79,14 @@ class LeapPainter():
 		return
 
 	def verify(self):
-		# TO-DO
 		if Arguments.isUsingPictureMode:
+			# TO-DO
 			return True
 		elif Arguments.isUsingBinaryMode:
+			# May change to another filename
 			benchmark = Storage.read("binary.obj")
-			# Issue: always return True
+			print ("Current: %s" % self.points)
+			# print ("Benchmark: %s" % benchmark)
 			if benchmark == self.points:
 				print True
 				return True
@@ -91,9 +94,9 @@ class LeapPainter():
 				print False
 				return False
 		elif Arguments.isUsingGestureMode:
+			# TO-DO
 			return True
-		else:
-			return True
+		
 
 	def processFrame(self):
 		if self.currentFrame.id == self.lastFrameId:
@@ -111,7 +114,8 @@ class LeapPainter():
 				self.isNextBinaryGesture = True
 				if self.idleCounter >= 30:
 					# do verification and display something secret
-					self.verify()
+					if not Arguments.isSettingAuthentication:
+						self.verify()
 					sys.exit(0)
 				return  
 
