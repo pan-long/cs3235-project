@@ -66,7 +66,7 @@ class LeapPainter():
 		if Arguments.isUsingPictureMode or Arguments.isUsingGestureMode:
 			color = self.rgb_to_hex((0, 160, 0))
 			for point in self.printablePoints:
-				self.draw(point.x * 800, 600 - point.y * 600, 40, 40, color)
+				self.draw(point.x * 800, 600 - point.y * 600, 30, 30, color)
 
 		# redraw lines that we have stored
 		if Arguments.isUsingPictureMode:
