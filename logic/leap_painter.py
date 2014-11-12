@@ -87,12 +87,28 @@ class LeapPainter():
 					coordinate.append(0.0)
 					coordinate.append(0.0)
 					coordinate.append(0.0)
+				for i in range(0, len(frame.hands[1].fingers)):
+					coordinate.append(frame.hands[1].fingers[i].tip_position.x)
+					coordinate.append(frame.hands[1].fingers[i].tip_position.y)
+					coordinate.append(frame.hands[1].fingers[i].tip_position.z)
+				for i in range(len(frame.hands[1].fingers), 5):
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+					coordinate.append(0.0)
 			else:
 				for i in range(0, len(frame.hands[1].fingers)):
 					coordinate.append(frame.hands[1].fingers[i].tip_position.x)
 					coordinate.append(frame.hands[1].fingers[i].tip_position.y)
 					coordinate.append(frame.hands[1].fingers[i].tip_position.z)
 				for i in range(len(frame.hands[1].fingers), 5):
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+					coordinate.append(0.0)
+				for i in range(0, len(frame.hands[0].fingers)):
+					coordinate.append(frame.hands[0].fingers[i].tip_position.x)
+					coordinate.append(frame.hands[0].fingers[i].tip_position.y)
+					coordinate.append(frame.hands[0].fingers[i].tip_position.z)
+				for i in range(len(frame.hands[0].fingers), 5):
 					coordinate.append(0.0)
 					coordinate.append(0.0)
 					coordinate.append(0.0)
@@ -115,7 +131,7 @@ class LeapPainter():
 					coordinate.append(frame.hands[0].fingers[i].tip_position.x)
 					coordinate.append(frame.hands[0].fingers[i].tip_position.y)
 					coordinate.append(frame.hands[0].fingers[i].tip_position.z)
-				for i in range(len(frame.hands[0].fingers) + 5, 10):
+				for i in range(len(frame.hands[0].fingers), 5):
 					coordinate.append(0.0)
 					coordinate.append(0.0)
 					coordinate.append(0.0)
@@ -150,17 +166,13 @@ class LeapPainter():
 			if (len(self.points) < len(benchmark) * 0.5) or (len(self.points) > len(benchmark) * 2):
 				print "Verification Failed."
 				return False
-			benchmarking = 0.0
-			for i in range(1, len(benchmark)):
-				for j in range(0, 30):
-					benchmarking += pow(benchmark[i][j] - benchmark[i-1][j], 2)
-			k = 100.0
-			threshold = min(k * pow(len(benchmark) * 30, 1.5), benchmarking * 0.9)
+			
+			k = 50.0
+			threshold = k * pow(len(benchmark) * 30, 1.5)
 			delta = 0.0
 			for i in range(1, min(len(benchmark), len(self.points))):
 				for j in range(0, 30):	
-					delta += pow((benchmark[i][j] - benchmark[i-1][j]) 
-						- (self.points[i][j] - self.points[i-1][j]), 2)
+					delta += pow((self.points[i][j] - self.points[i-1][j]) - (benchmark[i][j] - benchmark[i-1][j]), 2)
 
 			for i in range(min(len(benchmark), len(self.points)), max(len(benchmark), len(self.points))):
 				if len(benchmark) == max(len(benchmark), len(self.points)):
@@ -171,7 +183,6 @@ class LeapPainter():
 						delta += pow(self.points[i][j] - self.points[i-1][j], 2)
 
 			print "delta: %s" % delta
-			print "benchmarking: %s" % benchmarking
 			print "threshold: %s" % threshold
 			if delta <= threshold:
 				print "Verification Passed."
