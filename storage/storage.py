@@ -1,4 +1,5 @@
 import pickle
+import sys
 
 class Storage():
 	@staticmethod
@@ -17,3 +18,4 @@ class Storage():
 				return obj
 		except IOError:
 			print "Please set gesture for authentication first!"
+			sys.exit()
