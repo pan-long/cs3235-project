@@ -1,4 +1,5 @@
-Recognito: 3D Gesture Recognition Using Leap Motion
+Recognito: 3D Gesture Recognition Using Leap Motion  
+
 CS3235 Project
 AY2014/15 Group 12
 
