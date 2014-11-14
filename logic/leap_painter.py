@@ -34,6 +34,7 @@ class LeapPainter():
 	printablePoints = []
 	lines = []
 
+	# print some diagnostic info if debug mode is triggered
 	def printd(self, string):
 		if Arguments.isUsingDebugMode:
 			print string
@@ -137,6 +138,11 @@ class LeapPainter():
 		coordinate = []
 		interactionBox = frame.interaction_box
 
+		# For each frame, 10 tip coordninates will be stored.
+		# Fingers of left hand first, followed by fingers of right hand.
+		# For each tip coordinate, x, y, z values will be stored separately.
+		# Absent values will be set to 0.
+		# In total, there will be 30 elements in the list coordinate.
 		if len(frame.hands) == 2:
 			if frame.hands[0].is_left:
 				for i in range(0, len(frame.hands[0].fingers)):
@@ -198,6 +204,7 @@ class LeapPainter():
 		else:
 			return
 
+		# Draw the average tip position on screen.
 		average = Point(0.0, 0.0)
 		for point in frame.pointables:
 			point = interactionBox.normalize_point(point.tip_position)
@@ -218,6 +225,7 @@ class LeapPainter():
 		if Arguments.isUsingPictureMode:
 			benchmark = Storage.read("picture.data")
 
+			# If numbers of pressed points are not equal, verification is failed at once
 			if len(self.points) != len(benchmark):
 				return False
 			else:
@@ -231,7 +239,6 @@ class LeapPainter():
 
 
 		elif Arguments.isUsingBinaryMode:
-			# May change to another filename
 			benchmark = Storage.read("binary.data")
 			self.printd("Current: %s" % self.points)
 			self.printd("Benchmark: %s" % benchmark)
@@ -243,6 +250,7 @@ class LeapPainter():
 			if (len(self.points) < len(benchmark) * 0.5) or (len(self.points) > len(benchmark) * 1.5):
 				return False
 			
+			# Calculate difference and threshold
 			k = Arguments.errorInGesture
 			threshold = 0.0
 			rmsdiff = 0.0
@@ -269,7 +277,7 @@ class LeapPainter():
 
 	def processFrame(self):
 		if self.currentFrame.id == self.lastFrameId:
-			# if we requesting the frame too fast and get the same frame as last requesting,
+			# if we request the frame too fast and get the same frame as last request,
 			# simply ignore this frame as we have processed already
 			self.idleCounter += 1
 			return
@@ -281,7 +289,7 @@ class LeapPainter():
 			if len(frame.pointables) == 0:
 				self.idleCounter += 1
 				if self.idleCounter >= 30:
-					# do verification and display something secret
+					# do verification and display the result
 					Arguments.windowShouldClose = True
 					if not Arguments.isSettingAuthentication:
 						result = self.verify()

@@ -19,6 +19,7 @@ class MainUI(Tk):
         self.paintCanvas.pack(expand = YES, fill=BOTH)
         self.painter.set_canvas(self.paintCanvas)
 
+        # Draw the background picture
         if Arguments.isUsingPictureMode:
             Arguments.image = ImageTk.PhotoImage(Image.open(Arguments.picturePath).resize((800, 600)))
             self.paintCanvas.create_image(0, 0, image = Arguments.image, anchor = NW)
@@ -29,7 +30,8 @@ class MainUI(Tk):
         if not Arguments.windowShouldClose:
             self.painter.getFrame(self.controller)
             self.painter.processFrame()
-            # set to 20 FPS
+            # Process Frame every 50 milliseconds
+            # i.e. set to 20 FPS
             self.after(50, self.processFrame)
         else:
             self.geometry("450x200+400+300")
@@ -48,4 +50,5 @@ class MainUI(Tk):
 
             self.paintCanvas.itemconfig(text_id, text=text, font=("Comic Sans", 30))
 
+            # Exit in 3 seconds after setting gesture or finishing verification
             self.after(3000, sys.exit)
