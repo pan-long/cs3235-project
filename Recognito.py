@@ -6,7 +6,7 @@ from storage.preference import Arguments
 
 def main(argv):
 	try:
-		opts, args = getopt.getopt(argv,"abghsp:",["picturePath="])
+		opts, args = getopt.getopt(argv,"abghsdp:",["picturePath="])
 	except getopt.GetoptError:
 		print 'leap_motion.py [-abghps]'
 		sys.exit(2)
@@ -29,6 +29,9 @@ def main(argv):
 		elif opt in ("-g", "--gesture"):
 			# use gesture mode
 			Arguments.isUsingGestureMode = True
+		elif opt in ("-d", "--debug"):
+			# use debug mode
+			Arguments.isUsingDebugMode = True
 		elif opt in ("-p", "--picture"):
 			# use picture mode
 			Arguments.isUsingPictureMode = True
